@@ -203,6 +203,7 @@ int main(int argc, char* argv[])
     Level cfgLogLevel = static_cast<Level>(static_cast<int>(Logging::ERROR) + config.logLevel);
 
     // configure logging
+
     logManager->configure(buildLoggerConfiguration(cfgLogLevel, cfgLogFile.string()));
 
     logger(INFO, BRIGHT_GREEN) << getProjectCLIHeader() << std::endl;
