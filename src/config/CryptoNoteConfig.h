@@ -73,6 +73,7 @@ TritaniumCoind --print-genesis-tx --genesis-block-reward-address TriLv2Fyavy8CXG
 * You should see your premine appear in the previously generated wallet.
 
 */
+
 const char GENESIS_COINBASE_TX_HEX[] = "011401ff000180e0afadc7b403020a7cad7d2061f0532d656b4bff3b3e000b322db1953738e09ac86eba8a92b59e2101c8c5e137c14dc30d4f75ac19de53ce5797fe0498ad1027be4673c7300bc4b79d";
 static_assert(sizeof(GENESIS_COINBASE_TX_HEX)/sizeof(*GENESIS_COINBASE_TX_HEX) != 1, "GENESIS_COINBASE_TX_HEX must not be empty.");
 
