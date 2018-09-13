@@ -30,7 +30,7 @@ const size_t   BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW             = 60;
 const size_t   BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW_V3          = 11;
 
 // MONEY_SUPPLY - total number coins to be generated
-const uint64_t MONEY_SUPPLY                                  = UINT64_C(100000000000000);
+const uint64_t MONEY_SUPPLY                                  = UINT64_C(150000000000000);
 const uint32_t ZAWY_DIFFICULTY_BLOCK_INDEX                   = 0;
 const size_t ZAWY_DIFFICULTY_V2                              = 0;
 const uint8_t ZAWY_DIFFICULTY_DIFFICULTY_BLOCK_VERSION       = 3;
@@ -46,7 +46,7 @@ const unsigned EMISSION_SPEED_FACTOR                         = 25;
 static_assert(EMISSION_SPEED_FACTOR <= 8 * sizeof(uint64_t), "Bad EMISSION_SPEED_FACTOR");
 
 /* Premine amount */
-const uint64_t GENESIS_BLOCK_REWARD                          = UINT64_C(0);
+const uint64_t GENESIS_BLOCK_REWARD                          = UINT64_C(15000000000000);
 
 /* How to generate a premine:
 
@@ -68,7 +68,7 @@ TurtleCoind --print-genesis-tx --genesis-block-reward-address TRTLv2Fyavy8CXG8BP
 * You should see your premine appear in the previously generated wallet.
 
 */
-const char     GENESIS_COINBASE_TX_HEX[]                     = "011401ff000188f3b501029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd0880712101392354812d16a6c26f41b56af66bae753960a45e94e2032babf86f7099f1dfb5";
+const char GENESIS_COINBASE_TX_HEX[] = "011401ff000180e0afadc7b403020c790e283112c6721d40977aced8a828fa740b1671df9bb12aac180d9fefd4c1210164063752e2042d883e15e9423be4a2fe1971997725bf7259ca039dba539ad256";
 
 /* This is the unix timestamp of the first "mined" block (technically block 2, not the genesis block)
    You can get this value by doing "print_block 2" in TurtleCoind. It is used to know what timestamp
@@ -218,6 +218,8 @@ const static boost::uuids::uuid CRYPTONOTE_NETWORK =
 
 const char* const SEED_NODES[] = {
   "192.243.108.55:12121", //tri1
-  "192.243.108.225:12121" //tri2
+  "192.243.108.225:12121", //tri2
+  "18.204.18.62:12121", //izzy1
+  "34.227.151.11:12121" //ed
 };
 } // CryptoNote
