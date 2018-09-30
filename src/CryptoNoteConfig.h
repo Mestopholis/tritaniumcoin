@@ -1,7 +1,7 @@
 // Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
 // Copyright (c) 2014-2018, The Monero Project
 // Copyright (c) 2018, The TurtleCoin Developers
-// 
+// Copyright (c) 2018, Tritanium Labs
 // Please see the included LICENSE file for more information.
 
 #pragma once
@@ -43,7 +43,12 @@ const uint64_t DIFFICULTY_WINDOW_V3                          = 60;
 const uint64_t DIFFICULTY_BLOCKS_COUNT_V3                    = DIFFICULTY_WINDOW_V3 + 1;
 
 const unsigned EMISSION_SPEED_FACTOR                         = 25;
+const unsigned EMISSION_SPEED_FACTOR_V2                      = 22;
 static_assert(EMISSION_SPEED_FACTOR <= 8 * sizeof(uint64_t), "Bad EMISSION_SPEED_FACTOR");
+
+static_assert(EMISSION_SPEED_FACTOR_V2 <= 8 * sizeof(uint64_t), "Bad EMISSION_SPEED_FACTOR");
+
+const uint64_t EMISSION_SPEED_V2_HEIGHT                      = 19450;
 
 /* Premine amount */
 const uint64_t GENESIS_BLOCK_REWARD                          = UINT64_C(15000000000000);
@@ -59,7 +64,7 @@ const uint64_t GENESIS_BLOCK_REWARD                          = UINT64_C(15000000
 --print-genesis-tx --genesis-block-reward-address <premine wallet address>
 
 For example:
-TurtleCoind --print-genesis-tx --genesis-block-reward-address TRTLv2Fyavy8CXG8BPEbNeCHFZ1fuDCYCZ3vW5H5LXN4K2M2MHUpTENip9bbavpHvvPwb4NDkBWrNgURAd5DB38FHXWZyoBh4wW
+TritaniumCoind --print-genesis-tx --genesis-block-reward-address TriLv2Fyavy8CXG8BPEbNeCHFZ1fuDCYCZ3vW5H5LXN4K2M2MHUpTENip9bbavpHvvPwb4NDkBWrNgURAd5DB38FHXWZyoBh4wW
 
 * Take the hash printed, and replace it with the hash below in GENESIS_COINBASE_TX_HEX
 
@@ -68,12 +73,12 @@ TurtleCoind --print-genesis-tx --genesis-block-reward-address TRTLv2Fyavy8CXG8BP
 * You should see your premine appear in the previously generated wallet.
 
 */
-const char GENESIS_COINBASE_TX_HEX[] = "011401ff000180e0afadc7b403020c790e283112c6721d40977aced8a828fa740b1671df9bb12aac180d9fefd4c1210164063752e2042d883e15e9423be4a2fe1971997725bf7259ca039dba539ad256";
+const char GENESIS_COINBASE_TX_HEX[] = "011401ff000180e0afadc7b403020a7cad7d2061f0532d656b4bff3b3e000b322db1953738e09ac86eba8a92b59e2101c8c5e137c14dc30d4f75ac19de53ce5797fe0498ad1027be4673c7300bc4b79d";
 
 /* This is the unix timestamp of the first "mined" block (technically block 2, not the genesis block)
-   You can get this value by doing "print_block 2" in TurtleCoind. It is used to know what timestamp
+   You can get this value by doing "print_block 2" in TritaniumCoind. It is used to know what timestamp
    to import from when the block height cannot be found in the node or the node is offline. */
-const uint64_t GENESIS_BLOCK_TIMESTAMP                       = 1512800692;
+const uint64_t GENESIS_BLOCK_TIMESTAMP                       = 1536845422;
 
 const size_t   CRYPTONOTE_REWARD_BLOCKS_WINDOW               = 100;
 const size_t   CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE     = 100000; //size of block (bytes) after which reward for block calculated using block size
@@ -98,7 +103,7 @@ const uint32_t MIXIN_LIMITS_V1_HEIGHT                        = 0;
 const uint32_t MIXIN_LIMITS_V2_HEIGHT                        = 100000;
 const uint32_t MIXIN_LIMITS_V3_HEIGHT                        = 200000;
 
-/* The mixin to use by default with zedwallet and turtle-service */
+/* The mixin to use by default with zedwallet and tritanium-service */
 /* DEFAULT_MIXIN_V0 is the mixin used before MIXIN_LIMITS_V1_HEIGHT is started */
 const uint64_t DEFAULT_MIXIN_V0                              = 3;
 const uint64_t DEFAULT_MIXIN_V1                              = MAXIMUM_MIXIN_V1;
@@ -151,7 +156,7 @@ static_assert(0 < UPGRADE_VOTING_THRESHOLD && UPGRADE_VOTING_THRESHOLD <= 100, "
 static_assert(UPGRADE_VOTING_WINDOW > 1, "Bad UPGRADE_VOTING_WINDOW");
 
 /* Block heights we are going to have hard forks at */
-const uint64_t FORK_HEIGHTS[] = {};
+const uint64_t FORK_HEIGHTS[] = {0};
 
 /* MAKE SURE TO UPDATE THIS VALUE WITH EVERY MAJOR RELEASE BEFORE A FORK */
 const uint64_t SOFTWARE_SUPPORTED_FORK_INDEX                 = 0;
@@ -193,8 +198,8 @@ const size_t   BLOCKS_IDS_SYNCHRONIZING_DEFAULT_COUNT        =  10000;  //by def
 const size_t   BLOCKS_SYNCHRONIZING_DEFAULT_COUNT            =  100;    //by default, blocks count in blocks downloading
 const size_t   COMMAND_RPC_GET_BLOCKS_FAST_MAX_COUNT         =  1000;
 
-const int      P2P_DEFAULT_PORT                              =  12121;
-const int      RPC_DEFAULT_PORT                              =  12122;
+const int      P2P_DEFAULT_PORT                              =  15123;
+const int      RPC_DEFAULT_PORT                              =  16123;
 
 const size_t   P2P_LOCAL_WHITE_PEERLIST_LIMIT                =  1000;
 const size_t   P2P_LOCAL_GRAY_PEERLIST_LIMIT                 =  5000;
@@ -213,13 +218,13 @@ const char     P2P_STAT_TRUSTED_PUB_KEY[]                    = "";
 
 const static boost::uuids::uuid CRYPTONOTE_NETWORK =
 {
-    {  0xa3, 0x74, 0xa7, 0x5e, 0xa4, 0x98, 0xd5, 0x28, 0x8a, 0x92, 0xf6, 0xad, 0xbb, 0x57, 0x8e, 0x12  }
+    {  0xb4, 0x32, 0xf5, 0x3d, 0xa7, 0x95, 0xd3, 0xa8, 0x5a, 0x52, 0x46, 0x5d, 0xb7, 0x5a, 0xde, 0x72  }
 };
 
 const char* const SEED_NODES[] = {
-  "192.243.108.55:12121", //tri1
-  "192.243.108.225:12121", //tri2
-  "18.212.173.42:12121", //izzy1
-  "18.205.29.105:12121" //ed
+  "192.243.108.55:15123", //tri1
+  "192.243.108.225:15123", //tri2
+  "18.212.173.42:15123", //izzy1
+  "18.205.29.105:15123" //ed
 };
 } // CryptoNote
