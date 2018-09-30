@@ -1,7 +1,9 @@
 #include <windows.h>
 #include "version.h"
 
-IDI_ICON1    ICON    DISCARDABLE    "../config/icon.ico"
+
+IDI_ICON1    ICON    DISCARDABLE    "ttnz.ico"
+
 
 VS_VERSION_INFO VERSIONINFO
   FILEVERSION APP_VER_MAJOR,APP_VER_MINOR,APP_VER_REV,APP_VER_BUILD
@@ -21,10 +23,10 @@ VS_VERSION_INFO VERSIONINFO
       BLOCK "000004b0"
       BEGIN
         VALUE "CompanyName",      PROJECT_SITE
-        VALUE "FileDescription",  PROJECT_NAME " Turtle-Service " PROJECT_VERSION_LONG
+        VALUE "FileDescription",  PROJECT_NAME " Tritanium-Service " PROJECT_VERSION_LONG
         VALUE "FileVersion",      PROJECT_VERSION_BUILD_NO
         VALUE "LegalCopyright",   PROJECT_COPYRIGHT
-        VALUE "OriginalFilename", "turtle-service.exe"
+        VALUE "OriginalFilename", "tritanium-service.exe"
         VALUE "ProductName",      PROJECT_NAME
         VALUE "ProductVersion",   PROJECT_VERSION
       END

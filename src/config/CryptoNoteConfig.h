@@ -77,6 +77,7 @@ TritaniumCoind --print-genesis-tx --genesis-block-reward-address TriLv2Fyavy8CXG
 const char GENESIS_COINBASE_TX_HEX[] = "011401ff000180e0afadc7b403020a7cad7d2061f0532d656b4bff3b3e000b322db1953738e09ac86eba8a92b59e2101c8c5e137c14dc30d4f75ac19de53ce5797fe0498ad1027be4673c7300bc4b79d";
 static_assert(sizeof(GENESIS_COINBASE_TX_HEX)/sizeof(*GENESIS_COINBASE_TX_HEX) != 1, "GENESIS_COINBASE_TX_HEX must not be empty.");
 
+
 /* This is the unix timestamp of the first "mined" block (technically block 2, not the genesis block)
    You can get this value by doing "print_block 2" in TritaniumCoind. It is used to know what timestamp
    to import from when the block height cannot be found in the node or the node is offline. */
@@ -159,10 +160,12 @@ static_assert(0 < UPGRADE_VOTING_THRESHOLD && UPGRADE_VOTING_THRESHOLD <= 100, "
 static_assert(UPGRADE_VOTING_WINDOW > 1, "Bad UPGRADE_VOTING_WINDOW");
 
 /* Block heights we are going to have hard forks at */
+
 const uint64_t FORK_HEIGHTS[] = {
   0,  	   // 0
   350000,  // 1
 };
+
 
 /* MAKE SURE TO UPDATE THIS VALUE WITH EVERY MAJOR RELEASE BEFORE A FORK */
 const uint64_t SOFTWARE_SUPPORTED_FORK_INDEX                 = 1;

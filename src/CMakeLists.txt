@@ -20,6 +20,7 @@ file(GLOB_RECURSE CryptoNoteCore CryptoNoteCore/* CryptoNoteConfig.h)
 file(GLOB_RECURSE CryptoNoteProtocol CryptoNoteProtocol/*)
 file(GLOB_RECURSE CryptoTest CryptoTest/*)
 file(GLOB_RECURSE Errors Errors/*)
+file(GLOB_RECURSE TritaniumCoind Daemon/*)
 file(GLOB_RECURSE Http HTTP/*)
 file(GLOB_RECURSE JsonRpcServer JsonRpcServer/*)
 file(GLOB_RECURSE Logging Logging/*)
@@ -50,10 +51,10 @@ else()
     file(GLOB_RECURSE System System/* Platform/Linux/System/* Platform/Posix/System/*)
 endif()
 
-# Group the files together in IDEs
-source_group("" FILES $${Common} ${Crypto} ${CryptoNoteCore} ${CryptoNoteProtocol} ${TurtleCoind} ${JsonRpcServer} ${Http} ${Logging} ${Logger} ${miner} ${Mnemonics} ${Nigel} ${NodeRpcProxy} ${P2p} ${Rpc} ${Serialization} ${System} ${Transfers} ${Wallet} ${WalletApi} ${WalletBackend} ${zedwallet} ${zedwallet++} ${CryptoTest} ${Errors} ${Utilities} ${SubWallets})
 
-# Define a group of files as a library to link against
+# Group the files together in IDEs
+source_group("" FILES $${Common} ${Crypto} ${CryptoNoteCore} ${CryptoNoteProtocol} ${TritaniumCoind} ${JsonRpcServer} ${Http} ${Logging} ${Logger} ${miner} ${Mnemonics} ${Nigel} ${NodeRpcProxy} ${P2p} ${Rpc} ${Serialization} ${System} ${Transfers} ${Wallet} ${WalletApi} ${WalletBackend} ${zedwallet} ${zedwallet++} ${CryptoTest} ${Errors} ${Utilities} ${SubWallets})
+
 add_library(BlockchainExplorer STATIC ${BlockchainExplorer})
 add_library(Common STATIC ${Common})
 add_library(Crypto STATIC ${Crypto})
@@ -98,18 +99,22 @@ if(MSVC)
   )
 endif()
 
+
 add_executable(cryptotest ${CryptoTest} ${CT_SOURCES_OS})
 add_executable(miner ${miner} ${MINER_SOURCES_OS})
 add_executable(service ${service} ${PG_SOURCES_OS})
-add_executable(TurtleCoind ${TurtleCoind} ${DAEMON_SOURCES_OS})
+add_executable(TritaniumCoind ${TritaniumCoind} ${DAEMON_SOURCES_OS})
 add_executable(WalletApi ${WalletApi} ${WALLET_API_SOURCES_OS})
+
 add_executable(zedwallet ${zedwallet} ${ZED_WALLET_SOURCES_OS})
 add_executable(zedwallet++ ${zedwallet++} ${ZED_WALLET_SOURCES_OS})
 
 if(MSVC)
-    target_link_libraries(System ws2_32)
-    target_link_libraries(TurtleCoind Rpcrt4)
-    target_link_libraries(service Rpcrt4)
+
+  target_link_libraries(System ws2_32)
+  target_link_libraries(TritaniumCoind Rpcrt4)
+  target_link_libraries(service Rpcrt4)
+
 endif ()
 
 # A bit of hackery so we don't have to do the if/else/ for every target that
@@ -124,9 +129,9 @@ elseif (UNIX)
 endif()
 
 if(MSVC)
-	target_link_libraries(TurtleCoind System CryptoNoteCore rocksdb ${Boost_LIBRARIES})
+	target_link_libraries(TritaniumCoind System CryptoNoteCore rocksdb ${Boost_LIBRARIES})
 else()
-	target_link_libraries(TurtleCoind System CryptoNoteCore rocksdblib ${Boost_LIBRARIES})
+	target_link_libraries(TritaniumCoind System CryptoNoteCore rocksdblib ${Boost_LIBRARIES})
 endif()
 
 # Add the dependencies we need
@@ -156,15 +161,21 @@ add_dependencies(miner version)
 add_dependencies(JsonRpcServer version)
 add_dependencies(P2P version)
 add_dependencies(Rpc version)
+
 add_dependencies(service version)
-add_dependencies(TurtleCoind version)
+
 add_dependencies(WalletApi version)
 add_dependencies(WalletService version)
+
+add_dependencies(TritaniumCoind version)
+
 add_dependencies(zedwallet version)
 
 # Finally build the binaries
 
-set_property(TARGET TurtleCoind PROPERTY OUTPUT_NAME "TritaniumCoind")
+
+set_property(TARGET TritaniumCoind PROPERTY OUTPUT_NAME "TritaniumCoind")
+
 set_property(TARGET zedwallet PROPERTY OUTPUT_NAME "triwallet")
 set_property(TARGET zedwallet++ PROPERTY OUTPUT_NAME "triwallet-beta")
 set_property(TARGET service PROPERTY OUTPUT_NAME "tritanium-service")
@@ -173,8 +184,8 @@ set_property(TARGET miner PROPERTY OUTPUT_NAME "miner")
 set_property(TARGET cryptotest PROPERTY OUTPUT_NAME "cryptotest")
 set_property(TARGET WalletApi PROPERTY OUTPUT_NAME "wallet-api")
 
-# Additional make targets, can be used to build a subset of the targets
-# e.g. make pool will build only TurtleCoind and service
-add_custom_target(pool DEPENDS TurtleCoind service)
-add_custom_target(solominer DEPENDS TurtleCoind zedwallet miner)
-add_custom_target(cli DEPENDS TurtleCoind zedwallet)
+# Additional make targets
+add_custom_target(pool DEPENDS TritaniumCoind service)
+add_custom_target(solominer DEPENDS TritaniumCoind zedwallet miner)
+add_custom_target(cli DEPENDS TritaniumCoind zedwallet)
+

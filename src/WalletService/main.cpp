@@ -28,7 +28,7 @@
 #include <errno.h>
 #endif
 
-#define SERVICE_NAME "Turtle-Service"
+#define SERVICE_NAME "Tritanium-Service"
 
 PaymentGateService* ppg;
 
@@ -292,6 +292,7 @@ int main(int argc, char** argv) {
     if (!pg.init(argc, argv)) {
       return 0; //help message requested or so
     }
+
 
     std::cout << CryptoNote::getProjectCLIHeader();
 

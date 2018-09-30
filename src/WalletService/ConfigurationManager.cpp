@@ -134,10 +134,12 @@ bool ConfigurationManager::init(int argc, char** argv)
     throw std::runtime_error("--container-file parameter is required");
   }
 
+
   // If we are generating a new container, we can skip additional checks
   if (serviceConfig.generateNewContainer)
   {
     return true;
+
   }
 
   // Run authentication checks

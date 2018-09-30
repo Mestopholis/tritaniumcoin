@@ -55,7 +55,7 @@ int main(int argc, char **argv)
     System::Dispatcher localDispatcher;
     System::Dispatcher *dispatcher = &localDispatcher;
 
-    /* Our connection to turtlecoind */
+    /* Our connection to tritaniumcoind */
     std::unique_ptr<CryptoNote::INode> node(
         new CryptoNote::NodeRpcProxy(config.host, config.port, 10, logManager)
     );
@@ -130,7 +130,9 @@ void run(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
 
     bool alreadyShuttingDown = false;
 
+
     if (!quit)
+
     {
         /* Call shutdown on ctrl+c */
         /* walletInfo = walletInfo - workaround for
