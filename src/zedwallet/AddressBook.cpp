@@ -14,6 +14,8 @@
 
 #include <Serialization/SerializationTools.h>
 
+#include <Wallet/WalletUtils.h>
+
 #include <zedwallet/ColouredMsg.h>
 #include <zedwallet/Tools.h>
 #include <zedwallet/Transfer.h>
@@ -159,7 +161,7 @@ const Maybe<const AddressBookEntry> getAddressBookEntry(AddressBook addressBook)
     }
 }
 
-void sendFromAddressBook(std::shared_ptr<WalletInfo> &walletInfo,
+void sendFromAddressBook(std::shared_ptr<WalletInfo> walletInfo,
                          uint32_t height, std::string feeAddress,
                          uint32_t feeAmount)
 {
@@ -200,7 +202,7 @@ void sendFromAddressBook(std::shared_ptr<WalletInfo> &walletInfo,
     auto amount = maybeAmount.x;
     auto fee = WalletConfig::defaultFee;
     auto extra = getExtraFromPaymentID(addressBookEntry.paymentID);
-    auto mixin = WalletConfig::defaultMixin;
+    auto mixin = CryptoNote::getDefaultMixinByHeight(height);
     auto integrated = addressBookEntry.integratedAddress;
 
     if (integrated)
