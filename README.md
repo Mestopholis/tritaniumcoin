@@ -2,7 +2,7 @@
 
 ### Installing
 
-We offer binary images of the latest releases here: http://latest.turtlecoin.lol
+We offer binary images of the latest releases here: https://github.com/TritaniumCoin/TritaniumCoin/releases
 
 If you would like to compile yourself, read on.
 
