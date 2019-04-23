@@ -9,6 +9,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <limits>
+#include <string>
 #include <initializer_list>
 #include <boost/uuid/uuid.hpp>
 
@@ -198,6 +199,7 @@ const uint8_t  BLOCK_MAJOR_VERSION_1                         =  1;
 const uint8_t  BLOCK_MAJOR_VERSION_2                         =  2;
 const uint8_t  BLOCK_MAJOR_VERSION_3                         =  3;
 const uint8_t  BLOCK_MAJOR_VERSION_4                         =  4;
+const uint8_t  BLOCK_MAJOR_VERSION_5                         =  5;
 const uint8_t  BLOCK_MINOR_VERSION_0                         =  0;
 const uint8_t  BLOCK_MINOR_VERSION_1                         =  1;
 
@@ -212,6 +214,13 @@ const int      SERVICE_DEFAULT_PORT                          =  8070;
 const size_t   P2P_LOCAL_WHITE_PEERLIST_LIMIT                =  1000;
 const size_t   P2P_LOCAL_GRAY_PEERLIST_LIMIT                 =  5000;
 
+const uint8_t P2P_CURRENT_VERSION                            = 5;
+const uint8_t P2P_MINIMUM_VERSION                            = 4;
+
+const uint8_t P2P_LITE_BLOCKS_PROPOGATION_VERSION            = 4;
+
+const uint8_t P2P_UPGRADE_WINDOW                             = 2;
+
 const size_t   P2P_CONNECTION_MAX_WRITE_BUFFER_SIZE          = 32 * 1024 * 1024; // 32 MB
 const uint32_t P2P_DEFAULT_CONNECTIONS_COUNT                 = 8;
 const size_t   P2P_DEFAULT_WHITELIST_CONNECTIONS_PERCENT     = 70;
@@ -224,9 +233,18 @@ const uint64_t P2P_DEFAULT_INVOKE_TIMEOUT                    = 60 * 2 * 1000; //
 const size_t   P2P_DEFAULT_HANDSHAKE_INVOKE_TIMEOUT          = 5000;          // 5 seconds
 const char     P2P_STAT_TRUSTED_PUB_KEY[]                    = "";
 
+const uint64_t DATABASE_WRITE_BUFFER_MB_DEFAULT_SIZE         = 256;
+const uint64_t DATABASE_READ_BUFFER_MB_DEFAULT_SIZE          = 10;
+const uint32_t DATABASE_DEFAULT_MAX_OPEN_FILES               = 100;
+const uint16_t DATABASE_DEFAULT_BACKGROUND_THREADS_COUNT     = 2;
+
+const char LATEST_VERSION_URL[]                              = "http://github.com/TritaniumCoin/TritaniumCoin/releases/latest";
+const std::string LICENSE_URL                                = "http://github.com/TritaniumCoin/TritaniumCoin/releases/latest/";
+
+
 const static boost::uuids::uuid CRYPTONOTE_NETWORK =
 {
-    {  0xb4, 0x32, 0xf5, 0x3d, 0xa7, 0x95, 0xd3, 0xa8, 0x5a, 0x52, 0x46, 0x5d, 0xb7, 0x5a, 0xde, 0x72  } // change last 2 index to 0xde, 0x72 for prod
+    {  0xb4, 0x32, 0xf5, 0x3d, 0xa7, 0x95, 0xd3, 0xa8, 0x5a, 0x52, 0x46, 0x5d, 0xb7, 0x5a, 0x99, 0x99  } // change last 2 index to 0xde, 0x72 for prod
 };
 
 const char* const SEED_NODES[] = {
