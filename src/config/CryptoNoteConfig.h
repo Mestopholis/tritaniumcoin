@@ -48,12 +48,10 @@ static_assert(EMISSION_SPEED_FACTOR <= 8 * sizeof(uint64_t), "Bad EMISSION_SPEED
 
 static_assert(EMISSION_SPEED_FACTOR_V2 <= 8 * sizeof(uint64_t), "Bad EMISSION_SPEED_FACTOR");
 
-const uint64_t EMISSION_SPEED_V2_HEIGHT                      = 19450;
+const uint64_t EMISSION_SPEED_V2_HEIGHT                      = 2;
 
 /* Premine amount */
-const uint64_t GENESIS_BLOCK_REWARD                          = UINT64_C(15000000000000);
-
-/* How to generate a premine:
+const uint64_t GENESIS_BLOCK_REWARD                          = 0;/* How to generate a premine:
 
 * Compile your code
 
@@ -151,7 +149,7 @@ const uint32_t KEY_IMAGE_CHECKING_BLOCK_INDEX                = 0;
 const uint32_t UPGRADE_HEIGHT_V2                             = 1;
 const uint32_t UPGRADE_HEIGHT_V3                             = 2;
 const uint32_t UPGRADE_HEIGHT_V4                             = 3; // Upgrade height for CN-Lite Variant 1 switch.
-const uint32_t UPGRADE_HEIGHT_V5                             = 350000; // Upgrade height for CN-Turtle Variant 2 switch.
+const uint32_t UPGRADE_HEIGHT_V5                             = 120; // (Update to 350000 for prod) Upgrade height for CN-Turtle Variant 2 switch.
 const uint32_t UPGRADE_HEIGHT_CURRENT                        = UPGRADE_HEIGHT_V5;
 const unsigned UPGRADE_VOTING_THRESHOLD                      = 90;               // percent
 const uint32_t UPGRADE_VOTING_WINDOW                         = EXPECTED_NUMBER_OF_BLOCKS_PER_DAY;  // blocks
@@ -163,7 +161,7 @@ static_assert(UPGRADE_VOTING_WINDOW > 1, "Bad UPGRADE_VOTING_WINDOW");
 
 const uint64_t FORK_HEIGHTS[] = {
   0,  	   // 0
-  350000,  // 1
+  120,  // 1  (Change to 350000 for prod
 };
 
 
@@ -207,8 +205,8 @@ const size_t   BLOCKS_IDS_SYNCHRONIZING_DEFAULT_COUNT        =  10000;  //by def
 const size_t   BLOCKS_SYNCHRONIZING_DEFAULT_COUNT            =  100;    //by default, blocks count in blocks downloading
 const size_t   COMMAND_RPC_GET_BLOCKS_FAST_MAX_COUNT         =  1000;
 
-const int      P2P_DEFAULT_PORT                              =  15123;
-const int      RPC_DEFAULT_PORT                              =  16123;
+const int      P2P_DEFAULT_PORT                              =  17123;
+const int      RPC_DEFAULT_PORT                              =  18123;
 const int      SERVICE_DEFAULT_PORT                          =  8070;
 
 const size_t   P2P_LOCAL_WHITE_PEERLIST_LIMIT                =  1000;
@@ -228,14 +226,12 @@ const char     P2P_STAT_TRUSTED_PUB_KEY[]                    = "";
 
 const static boost::uuids::uuid CRYPTONOTE_NETWORK =
 {
-    {  0xb4, 0x32, 0xf5, 0x3d, 0xa7, 0x95, 0xd3, 0xa8, 0x5a, 0x52, 0x46, 0x5d, 0xb7, 0x5a, 0xde, 0x72  }
+    {  0xb4, 0x32, 0xf5, 0x3d, 0xa7, 0x95, 0xd3, 0xa8, 0x5a, 0x52, 0x46, 0x5d, 0xb7, 0x5a, 0xde, 0x72  } // change last 2 index to 0xde, 0x72 for prod
 };
 
 const char* const SEED_NODES[] = {
-  "192.243.108.55:15123", //tri1
-  "192.243.108.225:15123", //tri2
-  "18.212.173.42:15123", //izzy1
-  "18.205.29.105:15123" //ed
+  "199.175.55.60:17123", //tri1 testnet
+  "199.175.55.22:17123", //tri2 testnet
 };
 } // CryptoNote
 
