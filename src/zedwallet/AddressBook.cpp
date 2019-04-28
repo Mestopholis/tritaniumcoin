@@ -6,8 +6,6 @@
 #include <zedwallet/AddressBook.h>
 //////////////////////////////////
 
-#include <boost/algorithm/string.hpp>
-
 #ifndef MSVC
 #include <fstream>
 #endif
@@ -16,10 +14,10 @@
 
 #include <Wallet/WalletUtils.h>
 
-#include <zedwallet/ColouredMsg.h>
+#include <Utilities/ColouredMsg.h>
 #include <zedwallet/Tools.h>
 #include <zedwallet/Transfer.h>
-#include <zedwallet/WalletConfig.h>
+#include <config/WalletConfig.h>
 
 const std::string getAddressBookName(AddressBook addressBook)
 {
@@ -31,7 +29,7 @@ const std::string getAddressBookName(AddressBook addressBook)
                   << InformationMsg("give this address book entry?: ");
 
         std::getline(std::cin, friendlyName);
-        boost::algorithm::trim(friendlyName);
+        trim(friendlyName);
 
         const auto it = std::find(addressBook.begin(), addressBook.end(),
                             AddressBookEntry(friendlyName));
@@ -128,7 +126,7 @@ const Maybe<const AddressBookEntry> getAddressBookEntry(AddressBook addressBook)
                   << InformationMsg("address book?: ");
 
         std::getline(std::cin, friendlyName);
-        boost::algorithm::trim(friendlyName);
+        trim(friendlyName);
 
         if (friendlyName == "cancel")
         {
@@ -252,7 +250,7 @@ void deleteFromAddressBook()
                   << InformationMsg("delete?: ");
 
         std::getline(std::cin, friendlyName);
-        boost::algorithm::trim(friendlyName);
+        trim(friendlyName);
 
         if (friendlyName == "cancel")
         {
@@ -346,7 +344,7 @@ void listAddressBook()
 
 AddressBook getAddressBook()
 {
-    AddressBook addressBook = boost::value_initialized<decltype(addressBook)>();
+    AddressBook addressBook;
 
     std::ifstream input(WalletConfig::addressBookFilename);
 

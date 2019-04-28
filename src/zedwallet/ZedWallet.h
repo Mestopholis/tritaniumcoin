@@ -12,6 +12,3 @@ int main(int argc, char **argv);
 
 void run(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
          Config &config);
-
-bool shutdown(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
-              bool &alreadyShuttingDown);

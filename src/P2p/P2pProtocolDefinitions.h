@@ -1,26 +1,16 @@
 // Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
+// Copyright (c) 2018, The TurtleCoin Developers
 //
-// This file is part of Bytecoin.
-//
-// Bytecoin is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Bytecoin is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public License
-// along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
+// Please see the included LICENSE file for more information.
 
 #pragma once
 
 #include "P2pProtocolTypes.h"
 
+#include <boost/uuid/uuid.hpp>
+
 #include "crypto/crypto.h"
-#include "CryptoNoteConfig.h"
+#include <config/CryptoNoteConfig.h>
 #include "CryptoNoteCore/CoreStatistics.h"
 
 // new serialization
@@ -30,7 +20,7 @@
 
 namespace CryptoNote
 {
-  inline bool serialize(uuid& v, Common::StringView name, ISerializer& s) {
+  inline bool serialize(boost::uuids::uuid& v, Common::StringView name, ISerializer& s) {
     return s.binary(&v, sizeof(v), name);
   }
 
@@ -52,19 +42,13 @@ namespace CryptoNote
     uint32_t send_peerlist_sz;
   };
 
-  enum P2PProtocolVersion : uint8_t {
-    V0 = 0,
-    V1 = 1,
-    CURRENT = V1
-  };
-
   struct basic_node_data
   {
-    uuid network_id;
+    boost::uuids::uuid network_id;
     uint8_t version;
     uint64_t local_time;
     uint32_t my_port;
-    PeerIdType peer_id;
+    uint64_t peer_id;
 
     void serialize(ISerializer& s) {
       KV_MEMBER(network_id)
@@ -77,7 +61,7 @@ namespace CryptoNote
       KV_MEMBER(my_port)
     }
   };
-  
+
   struct CORE_SYNC_DATA
   {
     uint32_t current_height;
@@ -114,7 +98,7 @@ namespace CryptoNote
     {
       basic_node_data node_data;
       CORE_SYNC_DATA payload_data;
-      std::list<PeerlistEntry> local_peerlist; 
+      std::list<PeerlistEntry> local_peerlist;
 
       void serialize(ISerializer& s) {
         KV_MEMBER(node_data)
@@ -163,7 +147,7 @@ namespace CryptoNote
   struct COMMAND_PING
   {
     /*
-      Used to make "callback" connection, to be sure that opponent node 
+      Used to make "callback" connection, to be sure that opponent node
       have accessible connection point. Only other nodes can add peer to peerlist,
       and ONLY in case when peer has accepted connection and answered to ping.
     */
@@ -180,7 +164,7 @@ namespace CryptoNote
     struct response
     {
       std::string status;
-      PeerIdType peer_id;
+      uint64_t peer_id;
 
       void serialize(ISerializer& s) {
         KV_MEMBER(status)
@@ -189,14 +173,14 @@ namespace CryptoNote
     };
   };
 
-  
+
 #ifdef ALLOW_DEBUG_COMMANDS
-  //These commands are considered as insecure, and made in debug purposes for a limited lifetime. 
+  //These commands are considered as insecure, and made in debug purposes for a limited lifetime.
   //Anyone who feel unsafe with this commands can disable the ALLOW_GET_STAT_COMMAND macro.
 
   struct proof_of_trust
   {
-    PeerIdType peer_id;
+    uint64_t peer_id;
     uint64_t    time;
     Crypto::Signature sign;
 
@@ -226,7 +210,7 @@ namespace CryptoNote
         KV_MEMBER(tr)
       }
     };
-    
+
     struct response
     {
       std::string version;
@@ -267,7 +251,7 @@ namespace CryptoNote
       std::list<PeerlistEntry> local_peerlist_white;
       std::list<PeerlistEntry> local_peerlist_gray;
       std::list<connection_entry> connections_list;
-      PeerIdType my_id;
+      uint64_t my_id;
       uint64_t local_time;
 
       void serialize(ISerializer& s) {
@@ -294,7 +278,7 @@ namespace CryptoNote
 
     struct response
     {
-      PeerIdType my_id;
+      uint64_t my_id;
 
       void serialize(ISerializer& s) {
         KV_MEMBER(my_id)

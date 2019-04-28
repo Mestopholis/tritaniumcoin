@@ -6,8 +6,6 @@
 #include <zedwallet/Open.h>
 ///////////////////////////
 
-#include <boost/algorithm/string.hpp>
-
 #include <CryptoNoteCore/Account.h>
 #include <CryptoNoteCore/CryptoNoteBasicImpl.h>
 
@@ -15,16 +13,29 @@
 
 #include <Wallet/WalletErrors.h>
 
-#include <zedwallet/ColouredMsg.h>
+#include <Utilities/ColouredMsg.h>
 #include <zedwallet/CommandImplementations.h>
 #include <zedwallet/Tools.h>
 #include <zedwallet/Transfer.h>
 #include <zedwallet/Types.h>
 #include <zedwallet/PasswordContainer.h>
-#include <zedwallet/WalletConfig.h>
+#include <config/WalletConfig.h>
 
 std::shared_ptr<WalletInfo> createViewWallet(CryptoNote::WalletGreen &wallet)
 {
+    std::cout << WarningMsg("View wallets are only for viewing incoming ")
+              << WarningMsg("transactions, and cannot make transfers.")
+              << std::endl;
+
+    bool create = confirm("Is this OK?");
+
+    std::cout << std::endl;
+
+    if (!create)
+    {
+        return nullptr;
+    }
+    
     Crypto::SecretKey privateViewKey = getPrivateKey("Private View Key: ");
 
     std::string address;
@@ -36,7 +47,7 @@ std::shared_ptr<WalletInfo> createViewWallet(CryptoNote::WalletGreen &wallet)
                   << InformationMsg(" address: ");
 
         std::getline(std::cin, address);
-        boost::algorithm::trim(address);
+        trim(address);
 
         if (parseStandardAddress(address, true))
         {
@@ -80,40 +91,36 @@ std::shared_ptr<WalletInfo> importWallet(CryptoNote::WalletGreen &wallet)
 std::shared_ptr<WalletInfo> mnemonicImportWallet(CryptoNote::WalletGreen
                                                  &wallet)
 {
-    std::string mnemonicPhrase;
-
-    Crypto::SecretKey privateSpendKey;
-    Crypto::SecretKey privateViewKey;
-
     while (true)
     {
         std::cout << InformationMsg("Enter your mnemonic phrase (25 words): ");
 
+        std::string mnemonicPhrase;
+
         std::getline(std::cin, mnemonicPhrase);
 
-        boost::algorithm::trim(mnemonicPhrase);
+        trim(mnemonicPhrase);
         
-        std::string error;
-
-        std::tie(error, privateSpendKey)
+        auto [error, privateSpendKey]
             = Mnemonics::MnemonicToPrivateKey(mnemonicPhrase);
 
-        if (!error.empty())
+        if (error)
         {
             std::cout << std::endl
-                      << WarningMsg(error)
+                      << WarningMsg(error.getErrorMessage())
                       << std::endl << std::endl;
         }
         else
         {
-            break;
+            Crypto::SecretKey privateViewKey;
+
+            CryptoNote::AccountBase::generateViewFromSpend(
+                privateSpendKey, privateViewKey
+            );
+
+            return importFromKeys(wallet, privateSpendKey, privateViewKey);
         }
     }
-
-    CryptoNote::AccountBase::generateViewFromSpend(privateSpendKey, 
-                                                   privateViewKey);
-
-    return importFromKeys(wallet, privateSpendKey, privateViewKey);
 }
 
 std::shared_ptr<WalletInfo> importFromKeys(CryptoNote::WalletGreen &wallet,
@@ -181,8 +188,8 @@ std::shared_ptr<WalletInfo> generateWallet(CryptoNote::WalletGreen &wallet)
                                         walletAddress, false, wallet);
 }
 
-std::tuple<bool, std::shared_ptr<WalletInfo>>
-    openWallet(CryptoNote::WalletGreen &wallet, Config &config)
+std::shared_ptr<WalletInfo> openWallet(CryptoNote::WalletGreen &wallet,
+                                       Config &config)
 {
     const std::string walletFileName = getExistingWalletFileName(config);
 
@@ -240,11 +247,8 @@ std::tuple<bool, std::shared_ptr<WalletInfo>>
                           << std::endl << std::endl;
             }
 
-            return std::make_tuple(true,
-                std::make_shared<WalletInfo>(
-                    walletFileName, walletPass, walletAddress, viewWallet,
-                    wallet
-                )
+            return std::make_shared<WalletInfo>(
+                walletFileName, walletPass, walletAddress, viewWallet, wallet
             );
 
         }
@@ -278,7 +282,7 @@ std::tuple<bool, std::shared_ptr<WalletInfo>>
 
                     std::cout << WarningMsg(msg.str()) << std::endl;
 
-                    return std::make_tuple(false, nullptr);
+                    return nullptr;
                 }
             }
 
@@ -293,10 +297,10 @@ std::tuple<bool, std::shared_ptr<WalletInfo>>
 
             const std::string errorMsg = e.what();
                 
-            /* The message actually has a \r\n on the end but i'd prefer to
-               keep just the raw string in the source so check the it starts
-               with instead */
-            if (boost::starts_with(errorMsg, alreadyOpenMsg))
+            /* The message actually has a \r\n on the end but I'd prefer to
+               keep just the raw string in the source so check if it starts
+               with the message instead */
+            if (startsWith(errorMsg, alreadyOpenMsg))
             {
                 std::cout << WarningMsg("Could not open wallet! It is already "
                                         "open in another process.")
@@ -313,7 +317,7 @@ std::tuple<bool, std::shared_ptr<WalletInfo>>
                           << WarningMsg(".")
                           << std::endl << std::endl;
 
-                return std::make_tuple(false, nullptr);
+                return nullptr;
             }
             else
             {
@@ -321,7 +325,8 @@ std::tuple<bool, std::shared_ptr<WalletInfo>>
                 std::cout << "Please report this error message and what "
                           << "you did to cause it." << std::endl << std::endl;
 
-                return std::make_tuple(false, nullptr);
+                wallet.shutdown();
+                return nullptr;
             }
         }
     }
@@ -329,8 +334,8 @@ std::tuple<bool, std::shared_ptr<WalletInfo>>
 
 Crypto::SecretKey getPrivateKey(std::string msg)
 {
-    const size_t privateKeyLen = 64;
-    size_t size;
+    const uint64_t privateKeyLen = 64;
+    uint64_t size;
 
     std::string privateKeyString;
     Crypto::Hash privateKeyHash;
@@ -342,7 +347,7 @@ Crypto::SecretKey getPrivateKey(std::string msg)
         std::cout << InformationMsg(msg);
 
         std::getline(std::cin, privateKeyString);
-        boost::algorithm::trim(privateKeyString);
+        trim(privateKeyString);
 
         if (privateKeyString.length() != privateKeyLen)
         {
@@ -416,11 +421,11 @@ std::string getExistingWalletFileName(Config &config)
                       << std::endl << std::endl;
         }
         /* Allow people to enter wallet name with or without file extension */
-        else if (boost::filesystem::exists(walletName))
+        else if (fileExists(walletName))
         {
             return walletName;
         }
-        else if (boost::filesystem::exists(walletFileName))
+        else if (fileExists(walletFileName))
         {
             return walletFileName;
         }
@@ -452,7 +457,7 @@ std::string getNewWalletFileName()
 
         const std::string walletFileName = walletName + ".wallet";
 
-        if (boost::filesystem::exists(walletFileName))
+        if (fileExists(walletFileName))
         {
             std::cout << std::endl
                       << WarningMsg("A wallet with the filename " )

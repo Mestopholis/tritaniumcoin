@@ -17,13 +17,13 @@
 
 #include "Checkpoints.h"
 #include "Common/StringTools.h"
-#include <boost/regex.hpp>
+#include <fstream>
 
 using namespace Logging;
 
 namespace CryptoNote {
 //---------------------------------------------------------------------------
-Checkpoints::Checkpoints(Logging::ILogger &log) : logger(log, "checkpoints") {}
+Checkpoints::Checkpoints(std::shared_ptr<Logging::ILogger> log) : logger(log, "checkpoints") {}
 //---------------------------------------------------------------------------
 bool Checkpoints::addCheckpoint(uint32_t index, const std::string &hash_str) {
   Crypto::Hash h = NULL_HASH;
@@ -33,59 +33,79 @@ bool Checkpoints::addCheckpoint(uint32_t index, const std::string &hash_str) {
     return false;
   }
 
-  if (!(0 == points.count(index))) {
+  /* The return value lets us check if it was inserted or not. If it wasn't,
+     there is already a key (i.e., a height value) existing */
+  if (!points.insert({index, h}).second)
+  {
     logger(ERROR, BRIGHT_RED) << "CHECKPOINT ALREADY EXISTS!";
     return false;
   }
 
-  points[index] = h;
   return true;
 }
-//---------------------------------------------------------------------------
-const boost::regex linesregx("\\r\\n|\\n\\r|\\n|\\r");
-const boost::regex fieldsregx(",(?=(?:[^\"]*\"[^\"]*\")*(?![^\"]*\"))");
-bool Checkpoints::loadCheckpointsFromFile(const std::string& fileName) {
-  std::string buff;
-  if (!Common::loadFileToString(fileName, buff)) {
-    logger(ERROR, BRIGHT_RED) << "Could not load checkpoints file: " << fileName;
-    return false;
-  }
-  const char* data = buff.c_str();
-  unsigned int length = strlen(data);
 
-  boost::cregex_token_iterator li(data, data + length, linesregx, -1);
-  boost::cregex_token_iterator end;
+bool Checkpoints::loadCheckpointsFromFile(const std::string& filename)
+{
+    std::ifstream file(filename);
 
-  int count = 0;
-  while (li != end) {
-    std::string line = li->str();
-    ++li;
- 
-    boost::sregex_token_iterator ti(line.begin(), line.end(), fieldsregx, -1);
-    boost::sregex_token_iterator end2;
- 
-    std::vector<std::string> row;
-    while (ti != end2) {
-      std::string token = ti->str();
-      ++ti;
-      row.push_back(token);
-    }
-    if (row.size() != 2) {
-      logger(ERROR, BRIGHT_RED) << "Invalid checkpoint file format";
-      return false;
-    } else {
-      uint32_t height = stoi(row[0]);
-      bool r = addCheckpoint(height, row[1]);
-      if (!r) {
+    if (!file)
+    {
+        logger(ERROR, BRIGHT_RED) << "Could not load checkpoints file: "
+                                  << filename;
+
         return false;
-      }
-      count += 1;
     }
-  }
 
-  logger(INFO) << "Loaded " << count << " checkpoints from " << fileName;
-  return true;
+    /* The block this checkpoint is for (as a string) */
+    std::string indexString;
+
+    /* The hash this block has (as a string) */
+    std::string hash;
+
+    /* The block index (as a uint64_t) */
+    uint64_t index;
+
+    /* Checkpoints file has this format:
+
+       index,hash
+       index2,hash2
+
+       So, we do std::getline() on the file with the delimiter as ',' to take
+       the index, then we do std::getline() on the file again with the standard
+       delimiter of '\n', to get the hash. */
+    while (std::getline(file, indexString, ','), std::getline(file, hash))
+    {
+        /* Try and parse the indexString as an int */
+        try
+        {
+            index = std::stoull(indexString);
+        }
+        catch (const std::out_of_range &)
+        {
+            logger(ERROR, BRIGHT_RED) << "Invalid checkpoint file format - "
+                                      << "height is out of range of uint64_t";
+        }
+        catch (const std::invalid_argument &)
+        {
+            logger(ERROR, BRIGHT_RED) << "Invalid checkpoint file format - "
+                                      << "could not parse height as a number";
+
+            return false;
+        }
+
+        /* Failed to parse hash, or checkpoint already exists */
+        if (!addCheckpoint(index, hash))
+        {
+            return false;
+        }
+    }
+
+    logger(INFO) << "Loaded " << points.size() << " checkpoints from "
+                 << filename;
+
+    return true;
 }
+
 //---------------------------------------------------------------------------
 bool Checkpoints::isInCheckpointZone(uint32_t index) const {
   return !points.empty() && (index <= (--points.end())->first);
@@ -115,33 +135,6 @@ bool Checkpoints::checkBlock(uint32_t index, const Crypto::Hash &h,
 bool Checkpoints::checkBlock(uint32_t index, const Crypto::Hash &h) const {
   bool ignored;
   return checkBlock(index, h, ignored);
-}
-//---------------------------------------------------------------------------
-bool Checkpoints::isAlternativeBlockAllowed(uint32_t  blockchainSize,
-                                            uint32_t  blockIndex) const {
-  if (blockchainSize == 0) {
-    return false;
-  }
-
-  auto it = points.upper_bound(blockchainSize);
-  // Is blockchainSize before the first checkpoint?
-  if (it == points.begin()) {
-    return true;
-  }
-
-  --it;
-  uint32_t checkpointIndex = it->first;
-  return checkpointIndex < blockIndex;
-}
-
-std::vector<uint32_t> Checkpoints::getCheckpointHeights() const {
-  std::vector<uint32_t> checkpointHeights;
-  checkpointHeights.reserve(points.size());
-  for (const auto& it : points) {
-    checkpointHeights.push_back(it.first);
-  }
-
-  return checkpointHeights;
 }
 
 }

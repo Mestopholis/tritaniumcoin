@@ -6,8 +6,6 @@
 #include <zedwallet/Tools.h>
 ////////////////////////////
 
-#include <boost/algorithm/string.hpp>
-
 #include <cmath>
 
 #include <Common/Base58.h>
@@ -17,13 +15,15 @@
 #include <CryptoNoteCore/CryptoNoteTools.h>
 #include <CryptoNoteCore/TransactionExtra.h>
 
+#include <fstream>
+
 #include <iostream>
 
-#include <zedwallet/ColouredMsg.h>
+#include <Utilities/ColouredMsg.h>
 #include <zedwallet/PasswordContainer.h>
-#include <zedwallet/WalletConfig.h>
+#include <config/WalletConfig.h>
 
-void confirmPassword(std::string walletPass, std::string msg)
+void confirmPassword(const std::string &walletPass, const std::string &msg)
 {
     /* Password container requires an rvalue, we don't want to wipe our current
        pass so copy it into a tmp string and std::move that instead */
@@ -43,7 +43,7 @@ uint64_t getDivisor()
     return static_cast<uint64_t>(pow(10, WalletConfig::numDecimalPlaces));
 }
 
-std::string formatAmount(uint64_t amount)
+std::string formatAmount(const uint64_t amount)
 {
     const uint64_t divisor = getDivisor();
     const uint64_t dollars = amount / divisor;
@@ -53,7 +53,7 @@ std::string formatAmount(uint64_t amount)
          + WalletConfig::ticker;
 }
 
-std::string formatAmountBasic(uint64_t amount)
+std::string formatAmountBasic(const uint64_t amount)
 {
     const uint64_t divisor = getDivisor();
     const uint64_t dollars = amount / divisor;
@@ -62,7 +62,7 @@ std::string formatAmountBasic(uint64_t amount)
     return std::to_string(dollars) + "." + formatCents(cents);
 }
 
-std::string formatDollars(uint64_t amount)
+std::string formatDollars(const uint64_t amount)
 {
     /* We want to format our number with comma separators so it's easier to
        use. Now, we could use the nice print_money() function to do this.
@@ -112,7 +112,7 @@ std::string formatDollars(uint64_t amount)
 
 /* Pad to the amount of decimal spaces, e.g. with 2 decimal spaces 5 becomes
    05, 50 remains 50 */
-std::string formatCents(uint64_t amount)
+std::string formatCents(const uint64_t amount)
 {
     std::stringstream stream;
     stream << std::setfill('0') << std::setw(WalletConfig::numDecimalPlaces)
@@ -120,14 +120,14 @@ std::string formatCents(uint64_t amount)
     return stream.str();
 }
 
-bool confirm(std::string msg)
+bool confirm(const std::string &msg)
 {
     return confirm(msg, true);
 }
 
 /* defaultReturn = what value we return on hitting enter, i.e. the "expected"
    workflow */
-bool confirm(std::string msg, bool defaultReturn)
+bool confirm(const std::string &msg, const bool defaultReturn)
 {
     /* In unix programs, the upper case letter indicates the default, for
        example when you hit enter */
@@ -164,11 +164,10 @@ bool confirm(std::string msg, bool defaultReturn)
         std::cout << WarningMsg("Bad input: ") << InformationMsg(answer)
                   << WarningMsg(" - please enter either Y or N.")
                   << std::endl;
-
     }
 }
 
-std::string getPaymentIDFromExtra(std::string extra)
+std::string getPaymentIDFromExtra(const std::string &extra)
 {
     std::string paymentID;
 
@@ -176,7 +175,7 @@ std::string getPaymentIDFromExtra(std::string extra)
     {
         std::vector<uint8_t> vecExtra;
 
-        for (auto it : extra)
+        for (const auto it : extra)
         {
             vecExtra.push_back(static_cast<uint8_t>(it));
         }
@@ -192,7 +191,7 @@ std::string getPaymentIDFromExtra(std::string extra)
     return paymentID;
 }
 
-std::string unixTimeToDate(uint64_t timestamp)
+std::string unixTimeToDate(const uint64_t timestamp)
 {
     const std::time_t time = timestamp;
     char buffer[100];
@@ -200,7 +199,8 @@ std::string unixTimeToDate(uint64_t timestamp)
     return std::string(buffer);
 }
 
-std::string createIntegratedAddress(std::string address, std::string paymentID)
+std::string createIntegratedAddress(const std::string &address,
+                                    const std::string &paymentID)
 {
     uint64_t prefix;
 
@@ -247,7 +247,7 @@ uint64_t getScanHeight()
         std::getline(std::cin, stringHeight);
 
         /* Remove commas so user can enter height as e.g. 200,000 */
-        boost::erase_all(stringHeight, ",");
+        removeCharFromString(stringHeight, ',');
 
         if (stringHeight == "")
         {
@@ -256,7 +256,11 @@ uint64_t getScanHeight()
 
         try
         {
-            return std::stoi(stringHeight);
+            return std::stoull(stringHeight);
+        }
+        catch (const std::out_of_range &)
+        {
+            std::cout << WarningMsg("Input is too large or too small!");
         }
         catch (const std::invalid_argument &)
         {
@@ -264,4 +268,152 @@ uint64_t getScanHeight()
                       << WarningMsg("a number!") << std::endl << std::endl;
         }
     }
+}
+
+/* Erases all instances of c from the string. E.g. 2,000,000 becomes 2000000 */
+void removeCharFromString(std::string &str, const char c)
+{
+    str.erase(std::remove(str.begin(), str.end(), c), str.end());
+}
+
+/* Trims any whitespace from left and right */
+void trim(std::string &str)
+{
+    rightTrim(str);
+    leftTrim(str);
+}
+
+void leftTrim(std::string &str)
+{
+    std::string whitespace = " \t\n\r\f\v";
+
+    str.erase(0, str.find_first_not_of(whitespace));
+}
+
+void rightTrim(std::string &str)
+{
+    std::string whitespace = " \t\n\r\f\v";
+
+    str.erase(str.find_last_not_of(whitespace) + 1);
+}
+
+/* Checks if str begins with substring */
+bool startsWith(const std::string &str, const std::string &substring)
+{
+    return str.rfind(substring, 0) == 0;
+}
+
+/* Does the given filename exist on disk? */
+bool fileExists(const std::string &filename)
+{
+    /* Bool conversion needs an explicit cast */
+    return static_cast<bool>(std::ifstream(filename));
+}
+
+bool shutdown(std::shared_ptr<WalletInfo> walletInfo, CryptoNote::INode &node,
+              bool &alreadyShuttingDown)
+{
+    if (alreadyShuttingDown)
+    {
+        std::cout << "Patience little turtle, we're already shutting down!" 
+                  << std::endl;
+
+        return false;
+    }
+
+    std::cout << InformationMsg("Shutting down...") << std::endl;
+
+    alreadyShuttingDown = true;
+
+    bool finishedShutdown = false;
+
+    std::thread timelyShutdown([&finishedShutdown]
+    {
+        const auto startTime = std::chrono::system_clock::now();
+
+        /* Has shutdown finished? */
+        while (!finishedShutdown)
+        {
+            const auto currentTime = std::chrono::system_clock::now();
+
+            /* If not, wait for a max of 20 seconds then force exit. */
+            if ((currentTime - startTime) > std::chrono::seconds(20))
+            {
+                std::cout << WarningMsg("Wallet took too long to save! "
+                                        "Force closing.") << std::endl
+                          << "Bye." << std::endl;
+                exit(0);
+            }
+
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
+    });
+
+    if (walletInfo != nullptr)
+    {
+        std::cout << InformationMsg("Saving wallet file...") << std::endl;
+
+        walletInfo->wallet.save();
+
+        std::cout << InformationMsg("Shutting down wallet interface...")
+                  << std::endl;
+
+        walletInfo->wallet.shutdown();
+    }
+
+    std::cout << InformationMsg("Shutting down node connection...")
+              << std::endl;
+
+    node.shutdown();
+
+    finishedShutdown = true;
+
+    /* Wait for shutdown watcher to finish */
+    timelyShutdown.join();
+
+    std::cout << "Bye." << std::endl;
+    
+    return true;
+}
+
+std::vector<std::string> split(const std::string& str, char delim = ' ')
+{
+    std::vector<std::string> cont;
+    std::stringstream ss(str);
+    std::string token;
+    while (std::getline(ss, token, delim)) {
+        cont.push_back(token);
+    }
+    return cont;
+}
+
+bool parseDaemonAddressFromString(std::string& host, int& port, const std::string& address)
+{
+    std::vector<std::string> parts = split(address, ':');
+
+    if (parts.empty())
+    {
+        return false;
+    }
+    else if (parts.size() >= 2)
+    {
+        try
+        {
+            host = parts.at(0);
+            port = std::stoi(parts.at(1));
+            return true;
+        }
+        catch (const std::out_of_range &)
+        {
+            return false;
+        }
+        catch (const std::invalid_argument &)
+        {
+            return false;
+        }
+    }
+
+    host = parts.at(0);
+    port = CryptoNote::RPC_DEFAULT_PORT;
+    return true;
 }
