@@ -53,7 +53,7 @@ const uint64_t EMISSION_SPEED_V2_HEIGHT                      = 19450;
 
 /* Premine amount */
 const uint64_t GENESIS_BLOCK_REWARD                          = UINT64_C(15000000000000);
-
+/*
 * Compile your code
 
 * Run zedwallet, ignore that it can't connect to the daemon, and generate an
