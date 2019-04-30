@@ -222,8 +222,8 @@ const int      SERVICE_DEFAULT_PORT                          =  8070;
 const size_t   P2P_LOCAL_WHITE_PEERLIST_LIMIT                =  1000;
 const size_t   P2P_LOCAL_GRAY_PEERLIST_LIMIT                 =  5000;
 
-const uint8_t P2P_CURRENT_VERSION                            = 5;
-const uint8_t P2P_MINIMUM_VERSION                            = 4;
+const uint8_t P2P_CURRENT_VERSION                            = 4;
+const uint8_t P2P_MINIMUM_VERSION                            = 1;
 
 const uint8_t P2P_LITE_BLOCKS_PROPOGATION_VERSION            = 4;
 
