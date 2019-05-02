@@ -34,7 +34,7 @@ If you are using Clang, you will need Clang 6.0 or higher. You will also need li
 - `cd tritaniumcoin`
 - `mkdir build`
 - `cd build`
-- `cmake ..`
+- `cmake -DCMAKE_BUILD_TYPE=Release ..`
 - `make`
 
 The binaries will be in the `src` folder when you are complete.
@@ -65,11 +65,11 @@ You need to modify the below command for your version of ubuntu - see https://ap
 - `export CC=clang-6.0`
 - `export CXX=clang++-6.0`
 - `git clone -b master --single-branch https://github.com/tritaniumcoin/tritaniumcoin`
-- `cd turtlecoin`
+- `cd tritaniumcoin`
 - `mkdir build`
 - `cd build`
 
-- `cmake ..`
+- `cmake -DCMAKE_BUILD_TYPE=Release ..`
 - `make`
 
 The binaries will be in the `src` folder when you are complete.
@@ -88,7 +88,7 @@ See the ubuntu instructions for an example.
 - `cd tritaniumcoin`
 - `mkdir build`
 - `cd build`
-- `cmake ..`
+- `cmake -DCMAKE_BUILD_TYPE=Release ..`
 - `make`
 
 The binaries will be in the `src` folder when you are complete.
@@ -109,11 +109,11 @@ The binaries will be in the `src` folder when you are complete.
 - `export CC=gcc-8`
 - `export CXX=g++-8`
 - `git clone -b master --single-branch https://github.com/tritaniumcoin/tritaniumcoin`
-- `cd turtlecoin`
+- `cd tritaniumcoin`
 - `mkdir build`
 - `cd build`
 
-- `cmake ..`
+- `cmake -DCMAKE_BUILD_TYPE=Release ..`
 - `make`
 
 The binaries will be in the `src` folder when you are complete.
@@ -138,7 +138,7 @@ The binaries will be in the `src` folder when you are complete.
 - `cd tritaniumcoin`
 - `mkdir build`
 - `cd build`
-- `cmake ..`
+- `cmake -DCMAKE_BUILD_TYPE=Release ...`
 - `make`
 
 The binaries will be in the `src` folder when you are complete.
@@ -191,7 +191,7 @@ Once you have a 64 bit image installed, setup proceeds the same as any Linux dis
 - `cd tritaniumcoin`
 - `mkdir build`
 - `cd build`
-- `cmake ..`
+- `cmake -DCMAKE_BUILD_TYPE=Release ..`
 - `make`
 
 The binaries will be in the `src` folder when you are complete.
